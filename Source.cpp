@@ -2,9 +2,20 @@
 
 #include<winsock2.h>
 #include<Windows.h>
+#include<string>
 
 #pragma comment(lib, "ws2_32.lib")
 #pragma warning(disable: 4996)
+
+SOCKET Connection;
+
+void ClientH() {
+	char msg[256];
+	while (true) {
+		recv(Connection, msg, sizeof(msg), 0);
+		std::cout << msg << std::endl;
+	}
+}
 int main() {
 	WSADATA wsaData;
 	WORD DLLVersion = MAKEWORD(2, 1);
@@ -18,16 +29,23 @@ int main() {
 	addr.sin_port = htons(1111);
 	addr.sin_family = AF_INET;
 
-	SOCKET Connection = socket(AF_INET, SOCK_STREAM, 0);
+	Connection = socket(AF_INET, SOCK_STREAM, 0);
 	if (connect(Connection, (SOCKADDR*)&addr, sizeof(addr)) != 0) {
 		std::cout << "Eror conect to server" << WSAGetLastError() << std::endl;
 		closesocket(Connection);
 		WSACleanup();
 		return 1;
 	}
-	char msg[256];
-	recv(Connection, msg, sizeof(msg), 0);
-	std::cout << msg << std::endl;
+	CreateThread(0, 0, (LPTHREAD_START_ROUTINE)ClientH, 0, 0, 0);
+
+	char msg1[256];
+	while (true) {
+		std::cin.getline(msg1, sizeof (msg1));
+		send(Connection, msg1, sizeof(msg1), 0);
+		Sleep(10);
+	}
+	recv(Connection, msg1, sizeof(msg1), 0);
+	std::cout << msg1 << std::endl;
 	closesocket(Connection);
 	WSACleanup();
 
