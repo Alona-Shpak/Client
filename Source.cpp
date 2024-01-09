@@ -8,6 +8,9 @@
 #pragma warning(disable: 4996)
 
 SOCKET Connection;
+void print() {
+	return 0;
+}
 
 void ClientH() {
 	char msg[256];
